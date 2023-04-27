@@ -1,0 +1,25 @@
+{
+    "name": "fagforbundet/notification-api-sms-notifier-bundle",
+    "description": "Notification API SMS transport for Symfony Notifier",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Fagforbundet\\NotificationApiSmsNotifierBundle\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tom Roar Furunes",
+            "email": "tom.roar@halloverden.no"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2",
+        "symfony/framework-bundle": "^6.2",
+        "symfony/notifier": "^6.2",
+        "symfony/http-client": "^6.2"
+    }
+}
