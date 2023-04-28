@@ -10,6 +10,7 @@ use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -23,6 +24,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class NotificationApiTransport extends AbstractTransport {
   protected const HOST = 'api.meldinger.fagforbundet.no';
+
+  private const HEADER_DEV_RECIPIENTS = 'X-Dev-Recipient-Overrides';
 
   /**
    * NotificationApiTransport constructor.
@@ -45,7 +48,10 @@ class NotificationApiTransport extends AbstractTransport {
       throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
     }
 
-    // TODO options?
+    $options = $message->getOptions() ?? new NotificationApiOptions();
+    if (!$options instanceof NotificationApiOptions) {
+      throw new LogicException(\sprintf('options passed to "%s", must be instance of "%s"', __CLASS__, NotificationApiOptions::class));
+    }
 
     $phoneNumberUtil = PhoneNumberUtil::getInstance();
 
@@ -59,17 +65,35 @@ class NotificationApiTransport extends AbstractTransport {
       throw new InvalidArgumentException(\sprintf('The phone number (%s) is not valid', $message->getPhone()));
     }
 
-    $response = $this->client->request(Request::METHOD_POST, \sprintf('https://%s/v1/notifications/sms', $this->getEndpoint()), [
-      'json' => [
-        'sms' => [
-          'text' => $message->getSubject(),
-          'recipients' => [
-            [
-              'phoneNumber' => $phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164)
-            ]
-          ]
+    $headers = [];
+    if (!empty($options->getDevRecipients())) {
+      $headers[self::HEADER_DEV_RECIPIENTS] = \implode(',', $options->getDevRecipients());
+    }
+
+    $requestArray = [
+      'text' => $message->getSubject(),
+      'recipients' => [
+        [
+          'phoneNumber' => $phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164)
         ]
-      ],
+      ]
+    ];
+
+    if ($name = $options->getName()) {
+      $requestArray['notification']['name'] = $name;
+    }
+
+    if ($externalReference = $options->getExternalReference()) {
+      $requestArray['notification']['externalReference'] = $externalReference;
+    }
+
+    if ($queueName = $options->getQueueName()) {
+      $requestArray['notification']['queueName'] = $queueName;
+    }
+
+    $response = $this->client->request(Request::METHOD_POST, \sprintf('https://%s/v1/notifications/sms', $this->getEndpoint()), [
+      'headers' => $headers,
+      'json' => $requestArray,
       'auth_bearer' => $this->bearerTokenService->getBearerToken()
     ]);
 
@@ -80,9 +104,7 @@ class NotificationApiTransport extends AbstractTransport {
     }
 
     $sentMessage = new SentMessage($message, (string) $this);
-
-    // TODO set message ID
-
+    $sentMessage->setMessageId($content['sms']['uuid']);
     return $sentMessage;
   }
 
