@@ -1,7 +1,7 @@
 services:
   hallo_verden_notification_api_sms_notifier.transport_factory:
     class: Fagforbundet\NotificationApiSmsNotifierBundle\Transport\NotificationApiTransportFactory
-    parent: notifier.transport_factory.abstract
+#    parent: notifier.transport_factory.abstract
     arguments:
       - '@HalloVerden\Oidc\ClientBundle\Interfaces\OpenIdProviderRegistryServiceInterface'
       - '@event_dispatcher'
