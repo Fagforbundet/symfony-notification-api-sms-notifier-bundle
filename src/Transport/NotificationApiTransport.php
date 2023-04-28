@@ -70,7 +70,7 @@ class NotificationApiTransport extends AbstractTransport {
       $headers[self::HEADER_DEV_RECIPIENTS] = \implode(',', $options->getDevRecipients());
     }
 
-    $requestArray = [
+    $sms = [
       'text' => $message->getSubject(),
       'recipients' => [
         [
@@ -80,20 +80,20 @@ class NotificationApiTransport extends AbstractTransport {
     ];
 
     if ($name = $options->getName()) {
-      $requestArray['notification']['name'] = $name;
+      $sms['notification']['name'] = $name;
     }
 
     if ($externalReference = $options->getExternalReference()) {
-      $requestArray['notification']['externalReference'] = $externalReference;
+      $sms['notification']['externalReference'] = $externalReference;
     }
 
     if ($queueName = $options->getQueueName()) {
-      $requestArray['notification']['queueName'] = $queueName;
+      $sms['notification']['queueName'] = $queueName;
     }
 
     $response = $this->client->request(Request::METHOD_POST, \sprintf('https://%s/v1/notifications/sms', $this->getEndpoint()), [
       'headers' => $headers,
-      'json' => $requestArray,
+      'json' => ['sms' => $sms],
       'auth_bearer' => $this->bearerTokenService->getBearerToken()
     ]);
 
