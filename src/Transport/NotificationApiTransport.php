@@ -3,6 +3,7 @@
 namespace Fagforbundet\NotificationApiSmsNotifierBundle\Transport;
 
 use Fagforbundet\NotificationApiSmsNotifierBundle\Exception\UnauthorizedException;
+use Fagforbundet\NotificationApiSmsNotifierBundle\Message\DevRecipientAwareSmsMessageInterface;
 use Fagforbundet\NotificationApiSmsNotifierBundle\Options\NotificationApiOptions;
 use Fagforbundet\NotificationApiSmsNotifierBundle\Service\BearerTokenServiceInterface;
 use libphonenumber\NumberParseException;
@@ -65,16 +66,18 @@ class NotificationApiTransport extends AbstractTransport {
       throw new InvalidArgumentException(\sprintf('The phone number (%s) is not valid', $message->getPhone()));
     }
 
+    $formattedPhoneNumber = $phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164);
+
     $headers = [];
-    if (!empty($options->getDevRecipients())) {
-      $headers[self::HEADER_DEV_RECIPIENTS] = \implode(',', $options->getDevRecipients());
+    if ($message instanceof DevRecipientAwareSmsMessageInterface and $message->isRecipientDevRecipient()) {
+      $headers[self::HEADER_DEV_RECIPIENTS] = $formattedPhoneNumber;
     }
 
     $sms = [
       'text' => $message->getSubject(),
       'recipients' => [
         [
-          'phoneNumber' => $phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164)
+          'phoneNumber' => $formattedPhoneNumber
         ]
       ]
     ];

@@ -5,7 +5,6 @@ namespace Fagforbundet\NotificationApiSmsNotifierBundle\Options;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 final class NotificationApiOptions implements MessageOptionsInterface {
-  const OPTION_DEV_RECIPIENTS = 'dev_recipients';
   const OPTION_NAME = 'name';
   const OPTION_EXTERNAL_REFERENCE = 'external_reference';
   const OPTION_QUEUE_NAME = 'queue_name';
@@ -14,23 +13,6 @@ final class NotificationApiOptions implements MessageOptionsInterface {
    * NotificationApiOptions constructor.
    */
   public function __construct(private array $options = []) {
-  }
-
-  /**
-   * @return string[]
-   */
-  public function getDevRecipients(): array {
-    return $this->options[self::OPTION_DEV_RECIPIENTS] ?? [];
-  }
-
-  /**
-   * @param string[] $recipients
-   *
-   * @return $this
-   */
-  public function setDevRecipients(array $recipients): self {
-    $this->options[self::OPTION_DEV_RECIPIENTS] = $recipients;
-    return $this;
   }
 
   /**
