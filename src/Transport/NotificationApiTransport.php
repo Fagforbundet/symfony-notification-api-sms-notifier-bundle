@@ -33,6 +33,7 @@ class NotificationApiTransport extends AbstractTransport {
    */
   public function __construct(
     private readonly BearerTokenServiceInterface $bearerTokenService,
+    private readonly ?string $defaultRegion = null,
     HttpClientInterface $client = null,
     EventDispatcherInterface $dispatcher = null
   ) {
@@ -57,7 +58,7 @@ class NotificationApiTransport extends AbstractTransport {
     $phoneNumberUtil = PhoneNumberUtil::getInstance();
 
     try {
-      $phoneNumber = $phoneNumberUtil->parse($message->getPhone());
+      $phoneNumber = $phoneNumberUtil->parse($message->getPhone(), $this->defaultRegion);
     } catch (NumberParseException $e) {
       throw new InvalidArgumentException(\sprintf('Unable to parse phone number (%s)', $message->getPhone()), previous: $e);
     }

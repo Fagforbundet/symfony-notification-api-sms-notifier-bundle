@@ -42,10 +42,11 @@ class NotificationApiTransportFactory extends AbstractTransportFactory {
     $openIdProvider = $this->openIdProviderRegistryService->getOpenIdProviderServiceByKey($this->getUser($dsn));
     $bearerTokenService = new BearerTokenService($openIdProvider);
 
+    $defaultRegion = $dsn->getOption('defaultRegion');
     $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
     $port = $dsn->getPort();
 
-    return (new NotificationApiTransport($bearerTokenService, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+    return (new NotificationApiTransport($bearerTokenService, $defaultRegion, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
   }
 
 }
