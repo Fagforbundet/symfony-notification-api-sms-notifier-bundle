@@ -2,7 +2,6 @@
 
 namespace Fagforbundet\NotificationApiSmsNotifierBundle\Transport;
 
-use Fagforbundet\NotificationApiSmsNotifierBundle\Exception\UnauthorizedException;
 use Fagforbundet\NotificationApiSmsNotifierBundle\Options\NotificationApiOptions;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
@@ -41,7 +40,6 @@ class NotificationApiTransport extends AbstractTransport {
 
   /**
    * @throws TransportExceptionInterface
-   * @throws UnauthorizedException
    */
   protected function doSend(MessageInterface $message): SentMessage {
     if (!$message instanceof SmsMessage) {
