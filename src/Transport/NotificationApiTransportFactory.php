@@ -39,10 +39,16 @@ class NotificationApiTransportFactory extends AbstractTransportFactory {
     }
 
     $defaultRegion = $dsn->getOption('defaultRegion');
+    $allowUnicode = $dsn->getOption('allowUnicode') === 'true';
+    $transliterate = $dsn->getOption('transliterate') === 'true';
     $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
     $port = $dsn->getPort();
 
-    return (new NotificationApiTransport($this->bearerTokenProvider->getBearerTokenCb($dsn), $defaultRegion, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+    return (new NotificationApiTransport($this->bearerTokenProvider->getBearerTokenCb($dsn), $defaultRegion, $this->client, $this->dispatcher))
+      ->setHost($host)
+      ->setPort($port)
+      ->setAllowUnicode($allowUnicode)
+      ->setTransliterate($transliterate);
   }
 
 }
