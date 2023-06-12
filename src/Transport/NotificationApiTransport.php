@@ -25,6 +25,9 @@ class NotificationApiTransport extends AbstractTransport {
 
   private const HEADER_DEV_RECIPIENTS = 'X-Dev-Recipient-Overrides';
 
+  private bool $allowUnicode = false;
+  private bool $transliterate = false;
+
   /**
    * NotificationApiTransport constructor.
    */
@@ -93,7 +96,7 @@ class NotificationApiTransport extends AbstractTransport {
 
     $response = $this->client->request(Request::METHOD_POST, \sprintf('https://%s/v1/notifications/sms', $this->getEndpoint()), [
       'headers' => $headers,
-      'json' => ['sms' => $sms],
+      'json' => ['sms' => $sms, 'allowUnicode' => $this->allowUnicode, 'transliterate' => $this->transliterate],
       'auth_bearer' => ($this->bearerTokenCb)()
     ]);
 
@@ -114,6 +117,26 @@ class NotificationApiTransport extends AbstractTransport {
 
   public function __toString(): string {
     return \sprintf('%s://%s', NotificationApiTransportFactory::SCHEME, $this->getEndpoint());
+  }
+
+  /**
+   * @param bool $allowUnicode
+   *
+   * @return static
+   */
+  public function setAllowUnicode(bool $allowUnicode): static {
+    $this->allowUnicode = $allowUnicode;
+    return $this;
+  }
+
+  /**
+   * @param bool $transliterate
+   *
+   * @return static
+   */
+  public function setTransliterate(bool $transliterate): static {
+    $this->transliterate = $transliterate;
+    return $this;
   }
 
 }
