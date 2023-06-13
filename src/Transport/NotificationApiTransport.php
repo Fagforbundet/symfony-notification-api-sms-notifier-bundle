@@ -2,6 +2,7 @@
 
 namespace Fagforbundet\NotificationApiSmsNotifierBundle\Transport;
 
+use Fagforbundet\NotificationApiSmsNotifierBundle\Message\NotificationApiSentMessage;
 use Fagforbundet\NotificationApiSmsNotifierBundle\Options\NotificationApiOptions;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
@@ -106,7 +107,8 @@ class NotificationApiTransport extends AbstractTransport {
       throw new TransportException('Unable to send SMS (response status is not successful)', $response, previous: $e);
     }
 
-    $sentMessage = new SentMessage($message, (string) $this);
+    $sentMessage = (new NotificationApiSentMessage($message, (string) $this))
+      ->setTextPartCount($content['sms']['textPartCount'] ?? null);
     $sentMessage->setMessageId($content['sms']['uuid']);
     return $sentMessage;
   }
