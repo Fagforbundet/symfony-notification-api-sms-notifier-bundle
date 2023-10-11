@@ -25,6 +25,7 @@ class NotificationApiTransport extends AbstractTransport {
   protected const HOST = 'api.meldinger.fagforbundet.no';
 
   private const HEADER_DEV_RECIPIENTS = 'X-Dev-Recipient-Overrides';
+  private const HEADER_FORCE_USE_RECIPIENTS = 'X-Force-Use-Recipients';
 
   private bool $allowUnicode = false;
   private bool $transliterate = false;
@@ -72,6 +73,10 @@ class NotificationApiTransport extends AbstractTransport {
     $headers = [];
     if ($options->isDevRecipient()) {
       $headers[self::HEADER_DEV_RECIPIENTS] = $formattedPhoneNumber;
+    }
+
+    if ($options->isForceUseRecipients()) {
+      $headers[self::HEADER_FORCE_USE_RECIPIENTS] = 'true';
     }
 
     $sms = [
