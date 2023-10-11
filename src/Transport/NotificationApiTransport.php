@@ -103,7 +103,7 @@ class NotificationApiTransport extends AbstractTransport {
     $response = $this->client->request(Request::METHOD_POST, \sprintf('https://%s/v1/notifications/sms', $this->getEndpoint()), [
       'headers' => $headers,
       'json' => ['sms' => $sms, 'allowUnicode' => $this->allowUnicode, 'transliterate' => $this->transliterate],
-      'auth_bearer' => ($this->bearerTokenCb)()
+      'auth_bearer' => ($this->bearerTokenCb)($options)
     ]);
 
     try {
