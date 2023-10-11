@@ -5,6 +5,7 @@ namespace Fagforbundet\NotificationApiSmsNotifierBundle\Options;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 final class NotificationApiOptions implements MessageOptionsInterface {
+  const OPTION_FORCE_USE_RECIPIENTS = 'force_use_recipients';
   const OPTION_DEV_RECIPIENT = 'dev_recipient';
   const OPTION_NAME = 'name';
   const OPTION_EXTERNAL_REFERENCE = 'external_reference';
@@ -14,6 +15,23 @@ final class NotificationApiOptions implements MessageOptionsInterface {
    * NotificationApiOptions constructor.
    */
   public function __construct(private array $options = []) {
+  }
+
+  /**
+   * @return bool
+   */
+  public function isForceUseRecipients(): bool {
+    return $this->options[self::OPTION_FORCE_USE_RECIPIENTS] ?? false;
+  }
+
+  /**
+   * @param bool $forceUseRecipients
+   *
+   * @return self
+   */
+  public function setForceUseRecipients(bool $forceUseRecipients): self {
+    $this->options[self::OPTION_FORCE_USE_RECIPIENTS] = $forceUseRecipients;
+    return $this;
   }
 
   /**
