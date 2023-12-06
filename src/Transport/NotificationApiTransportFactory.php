@@ -2,7 +2,8 @@
 
 namespace Fagforbundet\NotificationApiSmsNotifierBundle\Transport;
 
-use Fagforbundet\NotificationApiSmsNotifierBundle\Token\BearerTokenProviderInterface;
+use Fagforbundet\NotificationApiClientBundle\Client\NotificationApiClientInterface;
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -14,7 +15,7 @@ class NotificationApiTransportFactory extends AbstractTransportFactory {
   public const SCHEME = 'notification-api';
 
   public function __construct(
-    private readonly BearerTokenProviderInterface $bearerTokenProvider,
+    private readonly NotificationApiClientInterface $notificationApiClient,
     EventDispatcherInterface $dispatcher = null,
     HttpClientInterface $client = null
   ) {
@@ -41,12 +42,11 @@ class NotificationApiTransportFactory extends AbstractTransportFactory {
     $defaultRegion = $dsn->getOption('defaultRegion');
     $allowUnicode = $dsn->getOption('allowUnicode') === 'true';
     $transliterate = $dsn->getOption('transliterate') === 'true';
-    $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-    $port = $dsn->getPort();
+    if ($dsn->getHost() !== 'default') {
+      throw new IncompleteDsnException('Host must be set to default. Use Notification API client configuration to set host');
+    }
 
-    return (new NotificationApiTransport($this->bearerTokenProvider->getBearerTokenCb($dsn), $defaultRegion, $this->client, $this->dispatcher))
-      ->setHost($host)
-      ->setPort($port)
+    return (new NotificationApiTransport($this->notificationApiClient, $defaultRegion, $this->client, $this->dispatcher))
       ->setAllowUnicode($allowUnicode)
       ->setTransliterate($transliterate);
   }
