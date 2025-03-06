@@ -18,10 +18,10 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.2",
-        "symfony/framework-bundle": "^6.2",
-        "symfony/notifier": "^6.2",
-        "symfony/http-client": "^6.2",
+        "symfony/framework-bundle": "^6.4|^7.2",
+        "symfony/notifier": "^6.4|^7.2",
+        "symfony/http-client": "^6.4|^7.2",
         "giggsey/libphonenumber-for-php": "^8.13",
-        "fagforbundet/notification-api-client-bundle": "^1.0"
+        "fagforbundet/notification-api-client-bundle": "^1.1"
     }
 }
